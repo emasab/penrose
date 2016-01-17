@@ -1,0 +1,73 @@
+<!doctype html>
+<html ng-app="penroseApp" ng-controller="PenroseController">
+<head>
+<title>Penrose aperiodic tiling generator</title>
+<style>
+@font-face {
+  font-family: 'Roboto';
+  font-weight: 400;
+  font-style: normal;
+  src: url('./fonts/Roboto-regular/Roboto-regular.eot');
+  src: url('./fonts/Roboto-regular/Roboto-regular.eot?#iefix') format('embedded-opentype'),
+       local('Roboto'),
+       local('Roboto-regular'),
+       url('./fonts/Roboto-regular/Roboto-regular.woff2') format('woff2'),
+       url('./fonts/Roboto-regular/Roboto-regular.woff') format('woff'),
+       url('./fonts/Roboto-regular/Roboto-regular.ttf') format('truetype'),
+       url('./fonts/Roboto-regular/Roboto-regular.svg#Roboto') format('svg');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-weight: 700;
+  font-style: normal;
+  src: url('./fonts/Roboto-700/Roboto-700.eot');
+  src: url('./fonts/Roboto-700/Roboto-700.eot?#iefix') format('embedded-opentype'),
+       local('Roboto Bold'),
+       local('Roboto-700'),
+       url('./fonts/Roboto-700/Roboto-700.woff2') format('woff2'),
+       url('./fonts/Roboto-700/Roboto-700.woff') format('woff'),
+       url('./fonts/Roboto-700/Roboto-700.ttf') format('truetype'),
+       url('./fonts/Roboto-700/Roboto-700.svg#Roboto') format('svg');
+}
+
+body {background-color: rgb(86, 105, 99); font-family: "roboto"; color: white;}
+button {
+    border: 1px solid rgb(86, 105, 99);
+    display: inline-block;
+    cursor: pointer;
+    font-family: "roboto";
+    color: rgb(255, 255, 255);
+    font-size: 13px;
+    padding: 10px 15px;
+    text-decoration: none;
+    background: rgb(108, 124, 124); /*linear-gradient(rgb(118, 141, 135) 5%, rgb(108, 124, 124) 100%) rgb(118, 141, 135);*/
+    float: left;
+    margin-right: 5px;
+}
+button:hover, button.selected {background: #D1D7D7; color: black;}
+#buttons {margin-top: 10px;}
+.fullscreen #canvas {margin-left: 0%;}
+#canvas, #buttons {margin-left: 20%;}
+h1 {text-align: center; padding: 10px 0px; margin: 0px; font-size: 35px; font-variant:small-caps;}
+</style>
+</head>
+<body>
+<h1>Penrose aperiodic tiling generator</h1>
+<canvas id="canvas" width="1000" height="500"></canvas>
+<div id="buttons" >
+	<button ng-class="{selected:kitesSelected === true}" ng-click='switchKites()'>Kites & Darts</button>
+	<button ng-class="{selected:rombsSelected === true}" ng-click='switchRombs()'>Rombs</button>
+	<button ng-class="{selected:zoomSelected === true}" ng-click='switchZoom()'>Zoom</button>
+	<button ng-click='speedup()'>Speed up</button>
+	<button ng-click='slowdown()'>Slow down</button>
+	<button ng-class="{selected:rotationSelected === true}" ng-click='switchRotation()'>Rotate</button>
+	<button ng-class="{selected:colorSelected === true}" ng-click='switchChangeColor()'>Change Color</button>
+	<button ng-click='fullscreen()'>Fullscreen</button>
+</div>
+<script src="./angular.min.js"></script>
+<script src="./tinycolor-min.js"></script>
+<script src="greiner-hormann.min.js"></script>
+<script src="./penrose.js"></script>
+</body>
+</html>
