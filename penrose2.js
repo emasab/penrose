@@ -553,9 +553,9 @@ var Penrose = function(canvas, conf){
 
 		function step(timestamp) {
 		  if (!start) start = timestamp;
-		  var progress = 1;//timestamp - start;
+		  var progress = timestamp - start;
 		
-		  if(progress >= 0){
+		  if(progress >= 30){
 
 			  var ratio = 1 + (progress / me.timeToDouble);
 			  var rotation = currentRotation * (progress / me.timeToDouble);
@@ -569,7 +569,7 @@ var Penrose = function(canvas, conf){
 			  }
 
 			  me.shapes = me.removeOutside(me.shapes);
-			  //start = timestamp;
+			  start = timestamp;
 
 			  var nextTileDimensions = me.nextTile.dimensions();
 			  if(nextTileDimensions[X] > 5 
