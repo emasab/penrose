@@ -153,7 +153,7 @@ var drawShape = function(context, vertices, init, direction){
 	context.closePath();
 };
 
-var drawContour = function(context, vertices, contourType, color){
+var drawContour = function(context, vertices, contourType, color, clip){
 	
 	for(var i=0;i<vertices.length;i++){
 		context.beginPath();
@@ -166,8 +166,8 @@ var drawContour = function(context, vertices, contourType, color){
 		}
 		var vertex = vertices[i];
 		var next = vertices[(i+1) % vertices.length];
-		var vs1 = intersection([vertex,next], clipping);
-		//var vs1 = [[vertex, next]];
+		var vs1 = [[vertex, next]];
+		if(clip) var vs1 = intersection([vertex,next], clipping);
 		if(vs1 && vs1.length>0){
 			vs1 = vs1[0];
 			context.moveTo(vs1[0][X],vs1[0][Y]);
@@ -351,11 +351,12 @@ var Shape = function(type, vertices, conf, drawType){
 	if(drawType) this.drawType = drawType;
 	else this.drawType = type;
 	
-	this.draw = function(context){
+	this.draw = function(context, clip){
 		var dimensions = this.dimensions();
 		if(dimensions[X] < 1 || dimensions[Y] < 1) return;
 
-		var vs1 = this.intersection(clipping);
+		if(clip) var vs1 = this.intersection(clipping);
+		else var vs1 = [this.vertices];
 		if(vs1 && vs1.length>0){
 			var status1 = drawShape(context, vs1[0]);
 			fillShape(context, this.conf.shape_params[this.drawType]);
@@ -365,8 +366,8 @@ var Shape = function(type, vertices, conf, drawType){
 		
 	}
 
-	this.drawContour = function(context){
-		drawContour(context, this.vertices, this.conf.contours[this.type], this.conf.shape_params[this.drawType]);
+	this.drawContour = function(context, clip){
+		drawContour(context, this.vertices, this.conf.contours[this.type], this.conf.shape_params[this.drawType], clip);
 	}
 
 	this.bounds = function(){
@@ -464,13 +465,13 @@ var Penrose = function(canvas, conf){
 		this.center = this.nextTile.center();
 	}
 
-	this.draw = function(shapes){
+	this.draw = function(shapes, clip){
 		if(!shapes) shapes = this.shapes;
 		for(var j=0;j<shapes.length;j++){
-			shapes[j].draw(this.context);
+			shapes[j].draw(this.context, clip);
 		}
 		for(var j=0;j<shapes.length;j++){
-			shapes[j].drawContour(this.context);
+			shapes[j].drawContour(this.context, clip);
 		}
 	}
 
@@ -530,20 +531,20 @@ var Penrose = function(canvas, conf){
 				if(isnext) me.nextTile = me.shapes[i];
 			  }
 
-			  me.shapes = me.removeOutside(me.shapes);
-			  if(!me.dismissed){
-				 me.context.clearRect(0, 0, canvas.width, canvas.height);
-				 me.draw(me.shapes);
-			  }
 			  start = timestamp;
 
 			  var nextTileDimensions = me.nextTile.dimensions();
-			  if(nextTileDimensions[X] > 5 
-				|| nextTileDimensions[Y] > 5){
-				
+			  var decompose = nextTileDimensions[X] > 5 
+				|| nextTileDimensions[Y] > 5;
+			  if(decompose){
+				me.shapes = me.removeOutside(me.shapes);
 				me.decomposeNextTile();
 				currentRotation = Math.random() * Math.PI * maxRotation  - (Math.PI * maxRotation / 2 );
 			  } 
+			  if(!me.dismissed){
+				 me.context.clearRect(0, 0, canvas.width, canvas.height);
+				 me.draw(me.shapes, decompose);
+			  }			  
 		  }
 
 		  if(me.isZoomActive) window.requestAnimationFrame(step);
