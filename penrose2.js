@@ -568,13 +568,13 @@ var Penrose = function(canvas, conf){
 				if(isnext) me.nextTile = me.shapes[i];
 			  }
 
-			  me.shapes = me.removeOutside(me.shapes);
 			  start = timestamp;
 
 			  var nextTileDimensions = me.nextTile.dimensions();
 			  if(nextTileDimensions[X] > 5 
 				|| nextTileDimensions[Y] > 5){
-				
+
+				me.shapes = me.removeOutside(me.shapes);				
 				me.decomposeNextTile();
 				currentRotation = Math.random() * Math.PI * maxRotation  - (Math.PI * maxRotation / 2 );
 			  }
