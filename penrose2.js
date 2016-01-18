@@ -497,7 +497,6 @@ var Penrose = function(canvas, conf){
 		this.shapes.splice(this.shapes.indexOf(this.nextTile), 1);
 		var shapes1 = this.decompose([this.nextTile], this.conf.next_subdivisions);
 		this.shapes = this.shapes.concat(shapes1);
-		this.setShapes(this.shapes);
 		this.nextTile = this.chooseNextTile(shapes1);
 		this.center = this.nextTile.center();
 	}
@@ -554,9 +553,9 @@ var Penrose = function(canvas, conf){
 
 		function step(timestamp) {
 		  if (!start) start = timestamp;
-		  var progress = timestamp - start;
+		  var progress = 1;//timestamp - start;
 		
-		  if(progress >= 20){
+		  if(progress >= 0){
 
 			  var ratio = 1 + (progress / me.timeToDouble);
 			  var rotation = currentRotation * (progress / me.timeToDouble);
@@ -570,11 +569,7 @@ var Penrose = function(canvas, conf){
 			  }
 
 			  me.shapes = me.removeOutside(me.shapes);
-			  if(!me.dismissed){
-				 me.setShapes(me.shapes);
-				 me.draw();
-			  }
-			  start = timestamp;
+			  //start = timestamp;
 
 			  var nextTileDimensions = me.nextTile.dimensions();
 			  if(nextTileDimensions[X] > 5 
@@ -582,6 +577,10 @@ var Penrose = function(canvas, conf){
 				
 				me.decomposeNextTile();
 				currentRotation = Math.random() * Math.PI * maxRotation  - (Math.PI * maxRotation / 2 );
+			  }
+			  if(!me.dismissed){
+				 me.setShapes(me.shapes);
+				 me.draw();
 			  }
 		  }
 
