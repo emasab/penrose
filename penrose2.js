@@ -363,10 +363,11 @@ var Shape = function(type, vertices, conf, drawType){
 		}
 		
 	}*/
-	this.draw = function(graphics, penrose){
+	this.draw = function(graphics, penrose, clip){
 		var vertices = this.vertices;
 		var clipping = [[-penrose.width,-penrose.height], [2*penrose.width,-penrose.height], [2*penrose.width,2*penrose.height], [-penrose.width,2*penrose.height]];
-		var vs1 = this.intersection(clipping);
+		if(clip) var vs1 = this.intersection(clipping);
+		else var vs1 = [this.vertices];
 		if(vs1 && vs1.length>0){
 			vs1 = vs1[0];
 			var color = this.conf.shape_params[this.drawType].substring(1);
@@ -383,7 +384,8 @@ var Shape = function(type, vertices, conf, drawType){
 		for(var i=0;i<vertices.length;i++){
 			var vertex = vertices[i];
 			var next = vertices[(i+1) % vertices.length];
-			var vs1 = intersection([vertex,next], clipping);
+			var vs1 = [[vertex,next]];
+			if(clip) vs1 = intersection([vertex,next], clipping);
 			if(vs1 && vs1.length>0){
 				vs1 = vs1[0];
 
@@ -555,7 +557,7 @@ var Penrose = function(canvas, conf){
 		  if (!start) start = timestamp;
 		  var progress = timestamp - start;
 		
-		  if(progress >= 30){
+		  if(progress >= 10){
 
 			  var ratio = 1 + (progress / me.timeToDouble);
 			  var rotation = currentRotation * (progress / me.timeToDouble);
@@ -571,15 +573,16 @@ var Penrose = function(canvas, conf){
 			  start = timestamp;
 
 			  var nextTileDimensions = me.nextTile.dimensions();
-			  if(nextTileDimensions[X] > 5 
-				|| nextTileDimensions[Y] > 5){
+			  var decompose = nextTileDimensions[X] > 5 
+				|| nextTileDimensions[Y] > 5;
+			  if(decompose){
 
 				me.shapes = me.removeOutside(me.shapes);				
 				me.decomposeNextTile();
 				currentRotation = Math.random() * Math.PI * maxRotation  - (Math.PI * maxRotation / 2 );
 			  }
 			  if(!me.dismissed){
-				 me.setShapes(me.shapes);
+				 me.setShapes(me.shapes, decompose);
 				 me.draw();
 			  }
 		  }
@@ -696,7 +699,7 @@ var Penrose = function(canvas, conf){
 		if(this.timeToDouble>2500) this.timeToDouble = 2500;
 	}
 
-	this.setShapes = function(shapes){
+	this.setShapes = function(shapes, clip){
 		if(this.stage){
 			 for (var i = this.stage.children.length - 1; i >= 0; i--) {
 				this.stage.removeChild(this.stage.children[i]);
@@ -705,7 +708,7 @@ var Penrose = function(canvas, conf){
 		this.shapes = shapes;
 		for(var i=0;i<shapes.length;i++){
 			var graphics = new PIXI.Graphics();
-			shapes[i].draw(graphics, this);
+			shapes[i].draw(graphics, this, clip);
 			this.stage.addChild(graphics);
 		}
 	}
