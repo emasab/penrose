@@ -719,7 +719,7 @@ var Penrose = function(canvas, conf){
 	this.timeToDouble = 1000;
 	this.resizeCanvas();
 	this.stage = new PIXI.Stage(0xffffff);
-	this.renderer = PIXI.autoDetectRenderer(this.width, this.height, { backgroundColor: 0xffffff, antialias: true });
+	this.renderer = new PIXI.WebGLRenderer(this.width, this.height, { backgroundColor: 0xffffff, antialias: true });
 	this.view = this.renderer.view;	
 	this.canvas.appendChild(this.view);
 
