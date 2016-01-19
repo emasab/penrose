@@ -518,7 +518,7 @@ var Penrose = function(canvas, conf){
 		  if (!start) start = timestamp;
 		  var progress = timestamp - start;
 		
-		  if(progress >= 20){
+		  if(progress >= 30){
 
 			  var ratio = 1 + (progress / me.timeToDouble);
 			  var rotation = currentRotation * (progress / me.timeToDouble);
