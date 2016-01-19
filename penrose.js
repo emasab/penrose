@@ -514,11 +514,17 @@ var Penrose = function(canvas, conf){
 		var me = this;
 		var currentRotation = Math.random() * Math.PI * maxRotation  - (Math.PI * maxRotation / 2 );
 
+		var skipped = 0;
+		var minprog = 30;
+
 		function step(timestamp) {
 		  if (!start) start = timestamp;
 		  var progress = timestamp - start;
 		
-		  if(progress >= 30){
+		  if(progress >= minprog){
+			  
+			  if(skipped==0) minprog++;
+			  skipped=0;
 
 			  var ratio = 1 + (progress / me.timeToDouble);
 			  var rotation = currentRotation * (progress / me.timeToDouble);
@@ -545,6 +551,8 @@ var Penrose = function(canvas, conf){
 				 me.context.clearRect(0, 0, canvas.width, canvas.height);
 				 me.draw(me.shapes, decompose);
 			  }			  
+		  } else {
+			skipped++;
 		  }
 
 		  if(me.isZoomActive) window.requestAnimationFrame(step);
