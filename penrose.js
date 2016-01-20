@@ -550,11 +550,11 @@ var Penrose = function(canvas, conf){
 			  
 			  if(skipped==0){
 				numskipped++;
-				if(numskipped==3){
+				if(numskipped==2){
 					numskipped = 0;
 	  				minprog++;
 				}				
-		          }
+		          } else numskipped = 0;
 			  skipped=0;
 
 			  var ratio = 1 + (progress / me.timeToDouble);
