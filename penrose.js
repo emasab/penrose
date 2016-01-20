@@ -550,7 +550,7 @@ var Penrose = function(canvas, conf){
 			  
 			  if(skipped==0){
 				numskipped++;
-				if(numskipped==5){
+				if(numskipped==3){
 					numskipped = 0;
 	  				minprog++;
 				}				
