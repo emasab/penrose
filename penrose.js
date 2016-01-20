@@ -138,44 +138,68 @@ var drawShape = function(context, vertices, init, direction){
 	if(direction === undefined) direction = 1;
 
 	var i = init;
-	//context.moveTo(Math.round(vertices[i][X]),Math.round(vertices[i][Y]));
-	context.moveTo(vertices[i][X],vertices[i][Y]);
+	context.moveTo(Math.round(vertices[i][X]),Math.round(vertices[i][Y]));
+	//context.moveTo(vertices[i][X],vertices[i][Y]);
 	context.beginPath();
 	while(true){
 		i = (i+direction) % vertices.length;
 		if(i<0) i+=vertices.length;
 		if(i==init) break;
-		//context.lineTo(Math.round(vertices[i][X]),Math.round(vertices[i][Y]));
-		context.lineTo(vertices[i][X],vertices[i][Y]);
+		context.lineTo(Math.round(vertices[i][X]),Math.round(vertices[i][Y]));
+		//context.lineTo(vertices[i][X],vertices[i][Y]);
 	}
-	//context.lineTo(Math.round(vertices[i][X]),Math.round(vertices[i][Y]));
-	context.lineTo(vertices[i][X],vertices[i][Y]);
+	context.lineTo(Math.round(vertices[i][X]),Math.round(vertices[i][Y]));
+	//context.lineTo(vertices[i][X],vertices[i][Y]);
 	context.closePath();
 };
 
 var drawContour = function(context, vertices, contourType, color, clip){
 	
+	var black = [];
+	var color1 = [];
+
 	for(var i=0;i<vertices.length;i++){
 		context.beginPath();
-		if(contourType[i]){
-			context.lineWidth = 0.4;
-			context.strokeStyle = "black";
-		} else {
-			context.lineWidth = 1;		
-			context.strokeStyle = color;
-		}
 		var vertex = vertices[i];
 		var next = vertices[(i+1) % vertices.length];
-		var vs1 = [[vertex, next]];
-		if(clip) var vs1 = intersection([vertex,next], clipping);
-		if(vs1 && vs1.length>0){
-			vs1 = vs1[0];
-			context.moveTo(vs1[0][X],vs1[0][Y]);
-			context.lineTo(vs1[1][X],vs1[1][Y]);
-			context.closePath();
-			context.stroke();
+		if(contourType[i]){
+			black.push([vertex, next]);
+		} else {
+			color1.push([vertex, next]);
 		}
 	}
+
+	context.beginPath();
+	context.lineWidth = 0.4;
+	context.strokeStyle = "black";
+	for(var i=0;i<black.length;i++){
+		var vertex = black[i];
+		var vs1 = [vertex];
+		if(clip) var vs1 = intersection(vertex, clipping);
+		if(vs1 && vs1.length>0){
+			vs1 = vs1[0];
+			context.moveTo(Math.round(vs1[0][X]),Math.round(vs1[0][Y]));
+			context.lineTo(Math.round(vs1[1][X]),Math.round(vs1[1][Y]));
+		}
+	}
+	context.closePath();
+	context.stroke();
+
+	context.beginPath();
+	context.lineWidth = 1;		
+	context.strokeStyle = color;
+	for(var i=0;i<color1.length;i++){
+		var vertex = color1[i];
+		var vs1 = [vertex];
+		if(clip) var vs1 = intersection(vertex, clipping);
+		if(vs1 && vs1.length>0){
+			vs1 = vs1[0];
+			context.moveTo(Math.round(vs1[0][X]),Math.round(vs1[0][Y]));
+			context.lineTo(Math.round(vs1[1][X]),Math.round(vs1[1][Y]));
+		}
+	}
+	context.closePath();
+	context.stroke();
 
 }
 
@@ -515,15 +539,22 @@ var Penrose = function(canvas, conf){
 		var currentRotation = Math.random() * Math.PI * maxRotation  - (Math.PI * maxRotation / 2 );
 
 		var skipped = 0;
+		var numskipped = 0;
 		var minprog = 30;
 
 		function step(timestamp) {
 		  if (!start) start = timestamp;
 		  var progress = timestamp - start;
-		
+		  
 		  if(progress >= minprog){
 			  
-			  if(skipped==0) minprog++;
+			  if(skipped==0){
+				numskipped++;
+				if(numskipped==5){
+					numskipped = 0;
+	  				minprog++;
+				}				
+		          }
 			  skipped=0;
 
 			  var ratio = 1 + (progress / me.timeToDouble);
